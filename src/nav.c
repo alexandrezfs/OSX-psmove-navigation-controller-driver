@@ -1,6 +1,6 @@
 #include <hidapi/hidapi.h>
+#include <unistd.h>
 #include "nav.h"
-
 
 
 int main(int argc, char* argv[])
@@ -28,13 +28,43 @@ int main(int argc, char* argv[])
     // Set the hid_read() function to be non-blocking.
     hid_set_nonblocking(handle, 1);
 
-    CommandStruct* commandStruct = getCommandStructFromBuf(handle);
+    CommandStruct* commandStruct = malloc(sizeof(CommandStruct));
+
+    while (1) {
+        navPoll(handle, commandStruct);
+        sleep(50);
+    }
 
     return 0;
 }
 
+void navPoll(hid_device* handle, CommandStruct* commandStruct) {
 
-CommandStruct* getCommandStructFromBuf(hid_device* handle) {
+    commandStruct = readHidCommands(handle, commandStruct);
+    printCommandStruct(commandStruct);
+}
+
+void printCommandStruct(CommandStruct* commandStruct) {
+
+    printf("Buttons 1 (L3, D-pad) : %d\n", commandStruct->button1);
+    printf("Buttons 2 (X, Circle, L1, L2) : %d\n", commandStruct->button2);
+    printf("PS button : %d\n", commandStruct->psButton);
+    printf("Stick X-axis : %d\n", commandStruct->xAxisStick);
+    printf("Stick Y-axis : %d\n", commandStruct->yAxisStick);
+    printf("D-pad UP : %d\n", commandStruct->dPadUp);
+    printf("D-pad RIGHT : %d\n", commandStruct->dPadRight);
+    printf("D-pad DOWN : %d\n", commandStruct->dPadDown);
+    printf("D-pad LEFT : %d\n", commandStruct->dPadLeft);
+    printf("L2 button value : %d\n", commandStruct->l2);
+    printf("L1 button value : %d\n", commandStruct->l1);
+    printf("Circle button value : %d\n", commandStruct->circle);
+    printf("X button value : %d\n", commandStruct->xButton);
+    printf("Battery level : %d\n", commandStruct->battery);
+
+}
+
+
+CommandStruct* readHidCommands(hid_device* handle, CommandStruct* commandStruct) {
 
     unsigned char buf[65];
 
@@ -44,20 +74,56 @@ CommandStruct* getCommandStructFromBuf(hid_device* handle) {
     int res = hid_read_timeout(handle, buf, 65, 50);
     int i;
 
-    CommandStruct* commandStruct = (CommandStruct*) malloc(sizeof(CommandStruct));
-
     if (res < 0) {
         printf("Unable to read()\n");
     }
 
     // Print out the returned buffer.
     for (i = 0; i < res; i++) {
-        printf("buf[%d]: %d\n", i, buf[i]);
 
         switch (i) {
 
             case 2 :
                 commandStruct->button1 = buf[i];
+                break;
+            case 3 :
+                commandStruct->button2 = buf[i];
+                break;
+            case 4 :
+                commandStruct->psButton = buf[i];
+                break;
+            case 6 :
+                commandStruct->xAxisStick = buf[i];
+                break;
+            case 7 :
+                commandStruct->yAxisStick = buf[i];
+                break;
+            case 14 :
+                commandStruct->dPadUp = buf[i];
+                break;
+            case 15 :
+                commandStruct->dPadRight = buf[i];
+                break;
+            case 16 :
+                commandStruct->dPadDown = buf[i];
+                break;
+            case 17 :
+                commandStruct->dPadLeft = buf[i];
+                break;
+            case 18 :
+                commandStruct->l2 = buf[i];
+                break;
+            case 20 :
+                commandStruct->l1 = buf[i];
+                break;
+            case 23 :
+                commandStruct->circle = buf[i];
+                break;
+            case 24 :
+                commandStruct->xButton = buf[i];
+                break;
+            case 30 :
+                commandStruct->battery = buf[i];
                 break;
 
         }
