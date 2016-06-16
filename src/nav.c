@@ -1,5 +1,3 @@
-#include <hidapi/hidapi.h>
-#include <unistd.h>
 #include "nav.h"
 
 CommandStruct* commandStruct;
