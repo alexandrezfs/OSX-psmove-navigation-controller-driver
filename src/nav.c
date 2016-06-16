@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include "nav.h"
 
+CommandStruct* commandStruct;
 
 int main(int argc, char* argv[])
 {
@@ -28,23 +29,27 @@ int main(int argc, char* argv[])
     // Set the hid_read() function to be non-blocking.
     hid_set_nonblocking(handle, 1);
 
-    CommandStruct* commandStruct = malloc(sizeof(CommandStruct));
+    commandStruct = malloc(sizeof(CommandStruct));
 
-    while (1) {
-        navPoll(handle, commandStruct);
-        sleep(50);
-    }
+    startPolling(handle);
 
     return 0;
 }
 
-void navPoll(hid_device* handle, CommandStruct* commandStruct) {
+void startPolling(hid_device* handle) {
 
-    commandStruct = readHidCommands(handle, commandStruct);
-    printCommandStruct(commandStruct);
+    while (1) {
+        navPoll(handle);
+    }
 }
 
-void printCommandStruct(CommandStruct* commandStruct) {
+void navPoll(hid_device* handle) {
+
+    commandStruct = readHidCommands(handle);
+    printCommandStruct();
+}
+
+void printCommandStruct() {
 
     printf("Buttons 1 (L3, D-pad) : %d\n", commandStruct->button1);
     printf("Buttons 2 (X, Circle, L1, L2) : %d\n", commandStruct->button2);
@@ -63,8 +68,7 @@ void printCommandStruct(CommandStruct* commandStruct) {
 
 }
 
-
-CommandStruct* readHidCommands(hid_device* handle, CommandStruct* commandStruct) {
+CommandStruct* readHidCommands(hid_device* handle) {
 
     unsigned char buf[65];
 

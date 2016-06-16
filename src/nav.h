@@ -23,8 +23,10 @@ struct CommandStruct
     unsigned char battery;
 };
 
-CommandStruct* readHidCommands(hid_device* handle, CommandStruct* commandStruct);
+CommandStruct* readHidCommands(hid_device* handle);
 
-void printCommandStruct(CommandStruct* commandStruct);
+void startPolling(hid_device* handle);
 
-void navPoll(hid_device* handle, CommandStruct* commandStruct);
+void printCommandStruct();
+
+void navPoll(hid_device* handle);
