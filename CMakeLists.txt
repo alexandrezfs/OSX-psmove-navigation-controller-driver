@@ -31,6 +31,10 @@ list(APPEND PSMOVEAPI_REQUIRED_LIBS ${HIDAPI_LIBRARIES})
 
 set(SOURCE_FILES src/nav.c)
 
-add_executable(OSX-psmove-navigation-controller-driver ${SOURCE_FILES})
+
+
+add_library(OSX-psmove-navigation-controller-driver STATIC ${SOURCE_FILES})
 
 target_link_libraries(OSX-psmove-navigation-controller-driver ${PSMOVEAPI_REQUIRED_LIBS})
+
+

@@ -1,12 +1,12 @@
 #include "nav.h"
 
 CommandStruct* commandStruct;
+hid_device* handle;
 
 int main(int argc, char* argv[])
 {
     int res;
     wchar_t wstr[MAX_STR];
-    hid_device *handle;
 
     // Open the device using the VID, PID,
     handle = hid_open(0x054c, 0x0268, NULL);
@@ -29,22 +29,7 @@ int main(int argc, char* argv[])
 
     commandStruct = malloc(sizeof(CommandStruct));
 
-    startPolling(handle);
-
     return 0;
-}
-
-void startPolling(hid_device* handle) {
-
-    while (1) {
-        navPoll(handle);
-    }
-}
-
-void navPoll(hid_device* handle) {
-
-    commandStruct = readHidCommands(handle);
-    printCommandStruct();
 }
 
 void printCommandStruct() {
@@ -66,7 +51,7 @@ void printCommandStruct() {
 
 }
 
-CommandStruct* readHidCommands(hid_device* handle) {
+unsigned char readHid() {
 
     unsigned char buf[65];
 
@@ -74,11 +59,19 @@ CommandStruct* readHidCommands(hid_device* handle) {
 
     // Read requested state
     int res = hid_read_timeout(handle, buf, 65, 50);
-    int i;
 
     if (res < 0) {
         printf("Unable to read()\n");
     }
+
+    readHidCommands(buf, res);
+
+    return buf;
+}
+
+CommandStruct* readHidCommands(unsigned char buf[], int res) {
+
+    int i;
 
     // Print out the returned buffer.
     for (i = 0; i < res; i++) {
