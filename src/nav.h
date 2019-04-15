@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
 #define MAX_STR 255
 

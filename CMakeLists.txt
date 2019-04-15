@@ -6,7 +6,7 @@ find_path(HIDAPI_INCLUDE_DIR
         NAMES
         hidapi.h
         PATHS
-        /usr/local/include
+        /usr/local/include/hidapi
         )
 
 include(FindPackageHandleStandardArgs)
@@ -36,5 +36,3 @@ set(SOURCE_FILES src/nav.c)
 add_library(OSX-psmove-navigation-controller-driver STATIC ${SOURCE_FILES})
 
 target_link_libraries(OSX-psmove-navigation-controller-driver ${PSMOVEAPI_REQUIRED_LIBS})
-
-
